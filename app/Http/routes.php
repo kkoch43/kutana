@@ -11,6 +11,45 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+/**
+ * Home
+ */
+
+Route::get('/', [
+    'uses'=> 'HomeController@index',
+    'as'=> 'home',
+]
+);
+
+Route::get('alert', function (){
+    return redirect()->route('home')->with('info', 'You have signed up!');
 });
+
+/**
+ * Auth
+ */
+
+Route::get('signup', [
+    'uses'=> 'AuthController@getSignup',
+    'as'=> 'auth.signup',
+    'middleware'=> ['guest'],
+]);
+
+Route::post('signup', [
+    'uses'=> 'AuthController@postSignup',
+    'middleware'=> ['guest'],
+]);
+
+Route::get('signin', [
+    'uses'=> 'AuthController@getSignin',
+    'as'=> 'auth.signin',
+]);
+
+Route::post('signin', [
+    'uses'=> 'AuthController@postSignin',
+]);
+
+Route::get('signout', [
+    'uses'=> 'AuthController@signout',
+    'as'=> 'auth.signout',
+]);
