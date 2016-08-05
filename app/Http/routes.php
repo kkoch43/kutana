@@ -53,3 +53,20 @@ Route::get('signout', [
     'uses'=> 'AuthController@signout',
     'as'=> 'auth.signout',
 ]);
+
+/**
+ * Search
+ */
+Route::get('search', [
+    'uses'=> 'SearchController@getResults',
+    'as'=> 'search.results',
+]);
+
+/**
+ * profile
+ */
+
+Route::get('user/{username}', [
+    'uses' => 'ProfileController@getProfile',
+    'as' => 'profile.index',
+]);
