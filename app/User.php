@@ -49,6 +49,10 @@ class User extends Authenticatable
 
     }
 
+    public function statuses(){
+        return $this->hasMany('App\Status', 'user_id');
+    }
+
     public function friendOfMine(){
         return $this->belongsToMany('App\User', 'friends', 'userid', 'friend_id');
     }
@@ -60,6 +64,36 @@ class User extends Authenticatable
 
     public function friends(){
         return $this->friendOfMine()->wherePivot('accepted', true)->get()->merge($this->friendOf()->wherePivot('accepted', true)->get());
+    }
+
+    public function friendRequests(){
+        return $this->friendOfMine()->wherePivot('accepted', false)->get();
+    }
+
+    public function friendRequestsPending(){
+        return $this->friendOf()->wherePivot('accepted', false)->get();
+    }
+
+    public function hasFriendRequestPending(User $user){
+        return (bool) $this->friendRequestsPending()->where('id', $user->id)->count();
+    }
+
+    public function hasFriendRequestReceived(User $user){
+        return (bool) $this->friendRequests()->where('id', $user->id)->count();
+    }
+
+    public function addFriend(User $user){
+        $this->friendOf()->attach($user->id);
+    }
+
+    public function acceptFriendRequest(User $user){
+        $this->friendRequests()->where('id', $user->id)->first()->pivot->update([
+            'accepted'=> true,
+        ]);
+    }
+
+    public function isFriendsWith(User $user){
+        return (bool) $this->friends()->where('id', $user->id)->count();
     }
 }
 
