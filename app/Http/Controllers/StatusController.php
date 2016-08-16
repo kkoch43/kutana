@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Status;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
@@ -20,6 +21,22 @@ class StatusController extends Controller
             'body' => $request->input('status'),
         ]);
         return redirect()->route('home')->with('info', 'Status Posted');
+
+
+    }
+
+    public function postReply(Request $request, $statusId){
+        $this->validate($request, [
+            "reply-{$statusId}" => 'required|max:1000',
+            ], [
+                'required' => 'The reply body is required'
+        ]);
+
+        $status= Status::notReply()->find($statusId);
+
+        if (!$status) {
+            return redirect()->route('home');
+        }
 
 
     }
