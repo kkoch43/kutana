@@ -34,24 +34,34 @@
                             <p>{{ $status->body }}</p>
                             <ul class="list-inline">
                                 <li>{{ $status->created_at->diffForHumans()}}</li>
-                                <li><a href="#">Like</a></li>
-                                <li>10 likes</li>
+                                @if ($status->user->id !== Auth::user()->id)
+                                <li><a href="{{ route('status.like', [ 'statusId' => $status->id]) }}">Like</a></li>
+
+                                    @endif
+
+                                <li>{{ $status->likes->count() }} {{ str_plural('like', $status->likes->count()) }}</li>
                             </ul>
 
-                            <!-- <div class="media">
-                                 <a class="pull-left" href="#">
-                                     <img class="media-object" alt="" src="">
+                           @foreach ($status->replies as $reply)
+
+                             <div class="media">
+                                 <a class="pull-left" href="{{ route('profile.index', ['username' => $reply->user->username]) }}">
+                                     <img class="media-object" alt="{{ $reply->user->getNameOrUsername() }}" src="{{ $reply->user->getAvatarUrl() }}">
                                  </a>
                                  <div class="media-body">
-                                     <h5 class="media-heading"><a href="#">Billy</a></h5>
-                                     <p>Yes, it is lovely!</p>
+                                     <h5 class="media-heading"><a href="{{ route('profile.index', ['username' => $reply->user->username]) }}">{{ $reply->user->getNameOrUsername() }}</a></h5>
+                                     <p>{{ $reply->body }}</p>
                                      <ul class="list-inline">
-                                         <li>8 minutes ago.</li>
-                                         <li><a href="#">Like</a></li>
-                                         <li>4 likes</li>
+                                         <li>{{ $reply->created_at->diffForHumans() }}</li>
+                                        @if ($reply->user->id !== Auth::user()->id)
+                                         <li><a href="{{ route('status.like', [ 'statusId' => $status->id]) }}">Like</a></li>
+                                             @endif
+                                         <li>{{ $status->likes->count() }} {{ str_plural('like', $status->likes->count()) }}</li>
                                      </ul>
                                  </div>
-                             </div> -->
+                             </div>
+
+                            @endforeach
 
                             <form role="form" action="{{ route('status.reply', ['statusId'=> $status->id]) }}" method="post">
                                 <div class="form-group{{ $errors->has("reply-{$status->id}" )? ' has-error': '' }}">

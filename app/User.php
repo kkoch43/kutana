@@ -53,6 +53,11 @@ class User extends Authenticatable
         return $this->hasMany('App\Status', 'user_id');
     }
 
+    public function likes(){
+        return $this->hasMany('App\Like', 'user_id');
+    }
+
+
     public function friendOfMine(){
         return $this->belongsToMany('App\User', 'friends', 'userid', 'friend_id');
     }
@@ -86,6 +91,11 @@ class User extends Authenticatable
         $this->friendOf()->attach($user->id);
     }
 
+    public function deleteFriend(User $user){
+        $this->friendOf()->detach($user->id);
+        $this->friendOfMine()->detach($user->id);
+    }
+
     public function acceptFriendRequest(User $user){
         $this->friendRequests()->where('id', $user->id)->first()->pivot->update([
             'accepted'=> true,
@@ -94,6 +104,11 @@ class User extends Authenticatable
 
     public function isFriendsWith(User $user){
         return (bool) $this->friends()->where('id', $user->id)->count();
+    }
+
+    public function hasLikedStatus(Status $status)
+    {
+        return (bool) $status->likes->where('user_id', $this->id)->count();
     }
 }
 
